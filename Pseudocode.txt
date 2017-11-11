@@ -1,0 +1,17 @@
+You will write a MIPS program that reads a string of up to 8 characters from user input. If
+the string has only the characters from '0' to '9' and from 'a' to 'f' and from 'A' to 'F', the
+program prints out the unsigned decimal integer corresponding to the hexadecimal number
+in the string. Otherwise, the program prints out the message of "Invalid hexadecimal
+number.".
+
+
+
+Ask for user input
+Check to make sure user input is less than 8 characters
+Else print "Invalid hexadecimal number.”
+
+Validate string characters (0-9, a-f, A-F)
+Else print "Invalid hexadecimal number.”
+
+Loop through characters 
+return decimal integer for characters
