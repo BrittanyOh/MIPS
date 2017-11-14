@@ -1,9 +1,13 @@
+#DUE NOVEMBER 15 BY MIDNIGHT!!!
 .data
  prompt: .ascii "Enter your string"
- message: .ascii "Your string is "
- 
+
 .text
  #prompt users to enter string
- li $v0, 4
+ li $v0, 8
  la $a0, prompt
+ syscall
+
+ #get users input
+ li $v0, 4
  syscall
