@@ -5,6 +5,7 @@
 prompt: .asciiz "Enter your string: "
 results:   .asciiz "Your string is: "
 invalid: .asciiz "Invalid hexadecimal number."
+buffer:   .space 100
 
 
 .globl  main
@@ -21,9 +22,12 @@ li $t4, 8 # initialize the length to 8
 
  #read users input
  li $v0, 8
- move $a0, $v0
+ la $a0, buffer #load byte space into address
+ li $a1, 20
+ move $t0, $a0
  syscall
 
+la $a0, buffer
 jal strlen
 slt $t1,$t4,$v1
 beq $t1, $zero, end
@@ -32,11 +36,11 @@ beq $t1, $zero, end
  syscall
 
  strlen:
- addi $t2, $zero, 1 #initialize count to start with 1 for first character
- j strlen.test
+  addi $t2, $zero, 1 #initialize count to start with 1 for first character
+  j strlen.test
 
 strlen.loop:
- addi $a1, $a1, 1 #load increment string pointer
+ addi $a2, $a2, 1 #load increment string pointer
  addi $t2, $t2, 1 #increment count
 strlen.test:
  lb $t3, 0($a0)   #load the next character to t0
