@@ -1,3 +1,4 @@
+
 You will write a MIPS program that reads a string of up to 1000 characters from user input.
 The string consists of one or more substrings separated by comma. Spaces or tabs at the
 beginning or end or around commas are ignored, those spaces or tabs should stay. For each
@@ -24,4 +25,5 @@ Subprogram 3:
 It displays an unsigned decimal integer. The stack must be used to pass parameters into
 the subprogram. No values are returned.
 
-
+The main program must call Subprogram 2 for conversion and call Subprogram 3 for
+output.
