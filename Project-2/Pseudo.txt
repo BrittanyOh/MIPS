@@ -27,3 +27,27 @@ the subprogram. No values are returned.
 
 The main program must call Subprogram 2 for conversion and call Subprogram 3 for
 output.
+
+
+***PSEUDO CODE***
+
+subprogram_2:
+  call subprogram_1
+
+subprogram_1:
+  indicated char value
+  add to current sum
+  repeats till program reaches invalid character or space/new line
+
+
+subprogram_3:
+
+
+
+It converts a single hexadecimal string to a decimal integer. It must call Subprogram 1
+to get the decimal value of each of the characters in the string. Registers must be used
+to pass parameters into the subprogram. Values must be returned via the stack.
+
+subprogram_3:
+It displays an unsigned decimal integer. The stack must be used to pass parameters into
+the subprogram. No values are returned.
