@@ -20,13 +20,15 @@ main:
  li $t1, 0 # initialize length counter
  li $t6 # initialize second length counter
  la $s0, string # load address of string to s0
- jal loop #ca to check strings length
- add $t5, $zero, $t1 # store length in t5
  jal subprogram_2 # call validation function to count sum
 
+ #jal loop call to check strings length
+ #add $t5, $zero, $t1 store length in t5
 
 subprogram_2: # converts single hexadecimal string into a decimal integer
-li $t7, $t1
+  lb $t7, 0($s0)
+
+  li $t7, $t1
   la $t6, $t1 #load total length into t6
   jal loop #call loop to check strings length
   add $t5, $zero, $t1 # store length in t5
@@ -50,7 +52,6 @@ subprogram_1: #checks hexadecimal characters for validation and converts to deci
  addi $s0, $s0, 1
  beq $t0, 0, results
  beq $t0, 10, results
- beq $t0, 0, exit #if reaches a spaces returns back to string
  # check if char is invalid or num 0-9
  blt $t0, 48, invalid
  blt $t0, 58, is_num
