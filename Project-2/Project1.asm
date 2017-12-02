@@ -1,6 +1,6 @@
 .data
 prompt: .asciiz "Enter your string:"
-invalid_string: .asciiz "Invalid hexadecimal number."
+invalid_string: .asciiz "NaN"
 string:   .space 9
 
 
