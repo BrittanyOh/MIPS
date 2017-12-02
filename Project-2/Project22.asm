@@ -2,8 +2,10 @@
 invalid_string: .asciiz "NaN"
 large_string: .asciiz	"Large String"
 string:  .space 1001
-comma:					.asciiz	" "
-user_input:				.space	1001
+comma: .asciiz	" "
+user_input: .space	1001
+
+.text
 
 main:
  #read users input
@@ -191,18 +193,18 @@ main:
  lb $t3, 0($t0)					#Load next character into $t3
 
  slti $t4, $t3, '0'				#Check if current character is less than ascii value of '0'
- bne $t4, $zero, subprogram_2_error		#Substring is not a valid string
+ bne $t4, $zero, string_error2		#Substring is not a valid string
 
  slti $t4, $t3, 'A'				#Check if current character is less than ascii value of 'A'
  slti $t5, $t3, ':'				#Check if current character is less than ascii value of ':'
- bne $t4, $t5, subprogram_2_error		#If checks are not equal then character is between '9' and 'A'
+ bne $t4, $t5, string_error2		#If checks are not equal then character is between '9' and 'A'
 
  slti $t4, $t3, 'a'				#Check if current character is less than ascii value of 'a'
  slti $t5, $t3, 'G'				#Check if current character is less than ascii value of 'G'
- bne $t4, $t5, subprogram_2_error		#If checks are not equal then character is between 'F' and 'a'
+ bne $t4, $t5, string_error2		#If checks are not equal then character is between 'F' and 'a'
 
  slti $t4, $t3, 'g'
- beq $t4, $zero, subprogram_2_error		#Substring is not a valid string
+ beq $t4, $zero, string_error2		#Substring is not a valid string
 
  jal subprogram_1						#Go to subprogram_1
 
@@ -252,3 +254,5 @@ main:
  la $a0, comma					#Load comma string into $a0
  li $v0, 4						#Print comma string for separating the substrings
  syscall
+
+jr $ra                                                        #Return back to subprogram_2
