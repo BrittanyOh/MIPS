@@ -17,24 +17,25 @@ main:
  la $s3, string				#store string address in $s3 to know printing location
  and $t8, $t8, $zero	#flag when char/space has been read
  and $t9, $t9, $zero	#string length counter (8 max length)
+
  loop:
  lb $s0, 0($s2)					#Load character into $s0
 
  slti $t1, $t9, 9				#Check if current substring is longer than 8 characters
- beq $t1, $zero, length_error	#Throw length_error and skip to next comma
+ beq $t1, $zero, too_large	#if length is too long call too_large and skip to next comma
 
- beq $s0, $zero, print_strings	#Check if at end of input
- beq $s0, '\n', print_strings	#Check if at end of input
+ beq $s0, $zero, print	#check if you've reached end of user input
+ beq $s0, '\n', print   #check if you've reached end of user input
  beq $s0, ',', process_curr		#Process chars at the end of the current substring
  beq $s0, ' ', space_loop
 
  li $t8, 1						#Set seen valid character flag
  sb $s0, 0($s1)					#Save character in current string
- addi $s2, $s2, 1				#Go to next character from input
+ addi $s2, $s2, 1				#Go to next character in user input
  addi $s1, $s1, 1				#Go to next empty place in string
- addi $t9, $t9, 1				#Increment current substring length counter (max 8)
+ addi $t9, $t9, 1				#Increment length counter
 
- j loop							#Continue loop
+ j loop
 
 
  space_loop:
@@ -42,39 +43,39 @@ main:
  lb $s0, 0($s2)					#Load character into $s0
  beq $s0, ' ', space_loop		#Skip space if at the beginning or at the end
  beq $s0, '\t', space_loop
- beq $s0, $zero, print_strings	#Check if at end of input
- beq $s0, '\n', print_strings	#Check if at end of input
+ beq $s0, $zero, print	#check if you've reached end of user input
+ beq $s0, '\n', print	#check if you've reached end of user input
  beq $s0, ',', process_curr		#Process chars at the end of the current substring
 
- j is_valid						#Check if this is a valid char after reading spaces
+ j is_valid						#check if character is valid
 
 
  is_valid:
- bne $t8, $zero, main_error		#If previous valid char has been read then NaN
- sb $s0, 0($s1)					#First valid char encountered so save in string
- li $t8, 1						#Set seen valid character flag
- or $s3, $zero, $s1				#Update current string head pointer
- addi $s1, $s1, 1				#Go to next empty place in string
- addi $s2, $s2, 1				#Go to next character from input
- addi $t9, $t9, 1				#Increment current substring length counter (max 8)
+ bne $t8, $zero, string_error		#ff previous valid char has been read then NaN
+ sb $s0, 0($s1)					#save first valid character in string
+ li $t8, 1						#set seen valid character flag
+ or $s3, $zero, $s1				#Update string head pointer
+ addi $s1, $s1, 1				#next empty place in string
+ addi $s2, $s2, 1				#next character from input
+ addi $t9, $t9, 1				#Increment length counter
 
- j loop							#Back to main loop
+ j loop
 
 
  process_curr:
- la $a0, ($s3)					#Load beginning of current substring into $a0 as argument
- beq $t8, $zero, main_error		#If letter has not been seen then string is not valid
- jal subprogram_2						#Go to subroutine 2
+ la $a0, ($s3)					#load current substring starting from first letter
+ beq $t8, $zero, string_error		#ff letter has not been seen then string is not valid
+ jal subprogram_2
 
- addi $s2, $s2, 1				#Go to next character from input
+ addi $s2, $s2, 1				#Go to next character
  and $t8, $t8, $zero				#Reset seen valid character flag
  and $t9, $t9, $zero				#Reset substring counter
  or $s3, $s1, $zero				#Move head pointer of string to next substring beginning
 
- j loop							#Go back to main loop
+ j loop
 
 
- print_strings:
+ print:
  la $a0, ($s3)					#Load beginning of current substring into $a0 as argument
  lb $t1, 0($s3)					#Load first character in current substring
  beq $t1, '\n', end				#Check if at end of input string
@@ -83,7 +84,7 @@ main:
  j end
 
 
- main_error:
+ string_error:
  la $a0, invalid_string		#Load address of invalid_string
  li $v0, 4						#Print invalid_string
  syscall
@@ -97,7 +98,7 @@ main:
  j skip_loop						#Skip to next substring
 
 
- length_error:
+ too_large:
  la $a0, large_string		#Load address of invalid_string
  li $v0, 4						#Print invalid_string
  syscall
@@ -115,8 +116,8 @@ main:
  addi $s2, $s2, 1				#Go to next character in current string
  lb $s0, 0($s2)					#Load character into $s0
  #beq $s0, ' ', loop				#Check for spaces at the beginning of new substring
- beq $s0, $zero, print_strings	#Check if at end of input
- beq $s0, '\n', print_strings	#Check if at end of input
+ beq $s0, $zero, print	#Check if at end of input
+ beq $s0, '\n', print	#Check if at end of input
  beq $t1, $zero, loop
  bne $s0, ',', skip_loop			#Continue loop if space is seen
  addi $s2, $s2, 1
@@ -151,10 +152,10 @@ main:
  sll $t2, $t2, 4					#Multiply by 16
 
  slti $t4, $t3, ':'				#Check if character is a number
- bne $t4, $zero, num_subprogram_1		#Take care of character being a number case
+ bne $t4, $zero, is_num		#Take care of character being a number case
 
  slti $t4, $t3, 'G'				#Check if the character is uppercase
- bne $t4, $zero, upper_subprogram_1		#Take care of character being uppercase
+ bne $t4, $zero, is_uppercase		#Take care of character being uppercase
 
  addi $t4, $t3, -87				#Subtract 87 from lowercase to get hexadecimal value
  add $t2, $t2, $t4				#Add translated character to running sum
@@ -162,13 +163,13 @@ main:
  jr $ra							#Return to subprogram_2
 
 
- num_subprogram_1:
+ is_num:
  addi $t4, $t3, -48				#Subract 48 from number to get hexadecimal value
  add $t2, $t2, $t4				#Add translated character to running sum
  jr $ra							#Return to subprogram_2
 
 
- upper_subprogram_1:
+ is_uppercase:
  addi $t4, $t3, -55				#Subract 55 from uppercase to get hexadecimal value
  add $t2, $t2, $t4				#Add translated character to running sum
 
@@ -186,7 +187,7 @@ main:
 
  subprogram_2_loop:
  slt $t4, $t1, $t9				#Check if counter is less than substring length
- beq $t4, $zero, return_subprogram_2	#If equal or greater than, then return from subprogram_2
+ beq $t4, $zero, return_2	#If equal or greater than, then return from subprogram_2
  lb $t3, 0($t0)					#Load next character into $t3
 
  slti $t4, $t3, '0'				#Check if current character is less than ascii value of '0'
@@ -211,7 +212,7 @@ main:
  j subprogram_2_loop					#Continue the loop
 
 
- subprogram_2_error:
+ string_error2: #invalid string for subprogram 2
  lw $ra, 0($sp)					#Restore return address from the stack
  addi $sp, $sp, 12				#Return space on the stack
 
@@ -222,7 +223,7 @@ main:
  jr $ra							#Return to main/process_curr
 
 
- return_subprogram_2:
+ return_2: #returns value of subprogram_2
  li $t4, 10						#Load 10000 into $t4 for splitting $t2
  divu $t2, $t4					#Split unsigned number of $t2 and $t4
 
